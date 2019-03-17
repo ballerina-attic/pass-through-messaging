@@ -1,22 +1,22 @@
 import ballerina/http;
 import ballerina/log;
 //import ballerinax/docker;
-//import ballerinax/kubernetes;
+import ballerinax/kubernetes;
 
-//@kubernetes:Ingress {
-//    hostname:"ballerina.guides.io",
-//    name:"passthrough",
-//    path:"/"
-//}
-//@kubernetes:Service {
-//    serviceType:"NodePort",
-//    name:"OnlineShopping"
-//}
-//
-//@kubernetes:Deployment {
-//    image: "ballerina.guides.io/passthrough:v1.0",
-//    name: "ballerina-guides-passt-hrough-messaging"
-//}
+@kubernetes:Ingress {
+    hostname:"ballerina.guides.io",
+    name:"passthrough",
+    path:"/"
+}
+@kubernetes:Service {
+    serviceType:"NodePort",
+    name:"OnlineShopping"
+}
+
+@kubernetes:Deployment {
+    image: "ballerina.guides.io/passthrough:v1.0",
+    name: "ballerina-guides-passt-hrough-messaging"
+}
 
 //@docker:Expose {}
 listener http:Listener OnlineShoppingEP = new(9090);
@@ -26,7 +26,6 @@ listener http:Listener OnlineShoppingEP = new(9090);
 //    name:"LocalShop"
 //}
 //@docker:Expose {}
-
 listener http:Listener LocalShopEP = new(9091);
 
 //Defines a client endpoint for the local shop with online shop link.
@@ -53,7 +52,7 @@ service OnlineShopping on OnlineShoppingEP {
             //Sends the client response to the caller.
             var result = caller->respond(clientResponse);
             handleError(result);
-        } else if (clientResponse is error) {
+        } else {
             //Sends the error response to the caller.
             http:Response res = new;
             res.statusCode = 500;
