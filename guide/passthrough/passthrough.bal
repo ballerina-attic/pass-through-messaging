@@ -15,7 +15,11 @@ import ballerinax/kubernetes;
 
 @kubernetes:Deployment {
     image: "ballerina.guides.io/passthrough:v1.0",
-    name: "ballerina-guides-passt-hrough-messaging"
+    name: "ballerina-guides-passt-hrough-messaging",
+    username:"<USERNAME>",
+    password:"<PASSWORD>",
+    push:true,
+    imagePullPolicy:"Always"
 }
 
 //@docker:Expose {}
