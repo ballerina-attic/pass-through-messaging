@@ -47,26 +47,31 @@ So, messaging between 'OnlineShopping' and 'LocalShop' services act as pass-thro
 
 ### Create the project structure
 
-Ballerina is a complete programming language that supports custom project structures. Use the following package structure for this guide.
+Ballerina programming language supports structuring projects using modules.
 
-```
-pass-through-messaging
- └── guide
-     ├── passthrough
-     │   └── passthrough.bal
-     │  
-     └── tests
-         └── passthrough_test.bal
-
-```
-
-Create the above directories in your local machine and also create empty `.bal` files.
-
-Open the terminal and navigate to `pass-through-messaging/guide` and run the Ballerina project initializing toolkit.
+Open the terminal, create and navigate to `pass-through-messaging/guide` directory. Run the Ballerina project initializing toolkit.
 
 ```bash
    $ ballerina init
 ```
+Navigate to src directory and create `passthrough` directory, which will become a Ballerina module.
+
+```
+pass-through-messaging
+ └── guide
+     ├── Ballerina.toml
+     ├── src
+     │   └── passthrough
+     │       ├── passthrough.bal
+     │       ├── resources
+     │       └── tests
+     │           ├── passthrough_test.bal
+     │           └── resources
+     │  
+     └── tests
+
+```
+Lets create `passthrough.bal` inside the module.
 
 ### Developing the service
 
@@ -104,12 +109,11 @@ service OnlineShopping on OnlineShoppingEP {
             //Sends the error response to the caller.
             http:Response res = new;
             res.statusCode = 500;
-            var payload = clientResponse.detail().message;
-            if (payload is error) {
+            var payload = clientResponse.detail()?.message;
+            if (payload is ()) {
                 res.setPayload("Recursive error occurred while reading client response");
-                handleError(payload);
             } else {
-                res.setPayload(string.convert(payload));
+                res.setPayload(payload);
             }
             var result = caller->respond(res);
             handleError(result);
@@ -140,7 +144,6 @@ function handleError(error? result) {
         log:printError(result.reason(), err = result);
     }
 }
-
 ```
 
 ## Testing 
@@ -178,8 +181,8 @@ Welcome to Local Shop! Please put your order here.....
 To identify the message flow inside the services, there will be INFO in the notification channel.
 
 ```bash
-2018-06-23 05:45:27,849 INFO  [passthrough] - Request will be forwarded to Local Shop  ....... 
-2018-06-23 05:45:27,864 INFO  [passthrough] - You have been successfully connected to local shop  ....... 
+2019-08-02 18:03:01,730 INFO  [ballerina/log] - Request will be forwarded to Local Shop  .......
+2019-08-02 18:03:01,868 INFO  [ballerina/log] - You have been successfully connected to local shop  .......
 ```
 
 ### Writing unit tests 
@@ -208,24 +211,23 @@ After the development process, you can deploy the services using below methods b
 
 ### Deploying locally
 
-As the first step, you can build Ballerina executable archives (.balx) of the services that you developed above. Navigate to `Pass-through-messaging-ballerina-/guide` and run the following command.
+As the first step, you can build the executable jar file for the services that you developed above. Navigate to `Pass-through-messaging-ballerina-/guide` and run the following command.
 
 ```bash
    $ ballerina build
 ```
 
-Once the .balx files are created inside the target folder, you can run them using the following command. 
+Once the .jar files are created inside the target folder, you can run them using the following command. 
 
 ```bash
-   $ ballerina run target/<Exec_Archive_File_Name>
+   $ ballerina run target/bin/passthrough-executable.jar
 ```
 
 The successful execution of a service will show us something similar to the following output.
 
 ```
-   Initiating service(s) in 'target/passthrough.balx'
-   ballerina: started HTTP/WS endpoint 0.0.0.0:9091
-   ballerina: started HTTP/WS endpoint 0.0.0.0:9090   
+    [ballerina/http] started HTTP/WS listener 0.0.0.0:9090
+    [ballerina/http] started HTTP/WS listener 0.0.0.0:9091
 ```
 
 ### Deploying on Docker
